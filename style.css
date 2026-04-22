@@ -210,15 +210,8 @@ svg {
   color: #fff;
 }
 
-.signal-panel span,
 .signal-panel strong {
   display: block;
-}
-
-.signal-panel span {
-  margin-bottom: 0.9rem;
-  color: #c6d1d4;
-  font-weight: 800;
 }
 
 .signal-panel div,
@@ -229,15 +222,20 @@ svg {
   background: rgba(255, 255, 255, 0.18);
 }
 
-.signal-panel div:nth-child(2) {
+.signal-panel div:first-child,
+.signal-panel strong:first-child {
+  margin-top: 0;
+}
+
+.signal-panel div:nth-child(1) {
   width: 88%;
 }
 
-.signal-panel div:nth-child(3) {
+.signal-panel div:nth-child(2) {
   width: 68%;
 }
 
-.signal-panel div:nth-child(4) {
+.signal-panel div:nth-child(3) {
   width: 76%;
 }
 
@@ -249,10 +247,6 @@ svg {
   width: min(24rem, 88%);
   background: #fff;
   color: var(--ink);
-}
-
-.signal-panel.output span {
-  color: var(--muted);
 }
 
 .signal-panel.output strong {
