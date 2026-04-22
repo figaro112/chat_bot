@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="sk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MarketPilot | AI marketingový nástroj</title>
+    <meta
+      name="description"
+      content="Jednoduchý statický marketingový nástroj pre audit landing page a odporúčanie marketingovej stratégie."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#app" aria-label="MarketPilot">
+        <span class="brand-mark" aria-hidden="true">MP</span>
+        <span>
+          <strong>MarketPilot</strong>
+          <small>AI marketingový nástroj</small>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="Rýchla navigácia">
+        <a href="#app">Nástroj</a>
+        <a href="#test">Test</a>
+        <a href="#annotation">Anotácia</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Workshop výstup</p>
+          <h1 id="page-title">Marketingový návrh za pár vstupov</h1>
+          <p>
+            Zadaj cieľ, kontext a obmedzenia. Nástroj pripraví použiteľný audit
+            landing page alebo odporúčanú marketingovú stratégiu.
+          </p>
+          <a class="hero-action" href="#app">
+            Spustiť nástroj
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="signal-panel">
+            <span>Input</span>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="signal-flow">
+            <i></i>
+            <i></i>
+            <i></i>
+          </div>
+          <div class="signal-panel output">
+            <span>Output</span>
+            <strong>3 nedostatky</strong>
+            <strong>4 kroky</strong>
+            <strong>1 headline</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace" id="app" aria-labelledby="tool-title">
+        <div class="section-heading">
+          <p class="eyebrow">Generátor</p>
+          <h2 id="tool-title">Vyber variant a vyplň vstupy</h2>
+        </div>
+
+        <div class="tool-shell">
+          <section class="input-pane" aria-label="Vstupy">
+            <div class="mode-switch" role="tablist" aria-label="Variant nástroja">
+              <button
+                class="mode-button active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-mode="audit"
+              >
+                Audit landing page
+              </button>
+              <button
+                class="mode-button"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode="strategy"
+              >
+                Marketingový rozhodovač
+              </button>
+            </div>
+
+            <form id="marketing-form">
+              <div class="form-grid active" data-panel="audit">
+                <label>
+                  URL alebo stručný popis obsahu
+                  <textarea
+                    id="pageInput"
+                    rows="5"
+                    placeholder="napr. e-shop s prírodnou kozmetikou, úvodná stránka komunikuje dopravu zdarma a zľavu 10 %"
+                  ></textarea>
+                </label>
+                <label>
+                  Primárny cieľ stránky
+                  <select id="pageGoal">
+                    <option value="predaj">Predaj produktu alebo služby</option>
+                    <option value="lead">Získanie leadu</option>
+                    <option value="informovanie">Informovanie návštevníka</option>
+                    <option value="registracia">Registrácia alebo rezervácia</option>
+                  </select>
+                </label>
+                <label>
+                  Cieľová skupina
+                  <input
+                    id="pageAudience"
+                    type="text"
+                    placeholder="napr. mladé ženy 20-35, lokálni podnikatelia, B2B klienti"
+                  />
+                </label>
+              </div>
+
+              <div class="form-grid" data-panel="strategy">
+                <label>
+                  Dostupný rozpočet
+                  <input id="budget" type="number" min="0" step="50" value="500" />
+                </label>
+                <label>
+                  Typ podnikania
+                  <select id="businessType">
+                    <option value="lokalny">Lokálny podnik</option>
+                    <option value="eshop">E-shop</option>
+                    <option value="b2b">B2B služby</option>
+                    <option value="creator">Osobná značka alebo tvorca</option>
+                  </select>
+                </label>
+                <label>
+                  Marketingový cieľ
+                  <select id="marketingGoal">
+                    <option value="predaj">Predaj</option>
+                    <option value="brand">Budovanie značky</option>
+                    <option value="lead">Získavanie leadov</option>
+                    <option value="retencia">Udržanie zákazníkov</option>
+                  </select>
+                </label>
+                <label>
+                  Popis ponuky
+                  <textarea
+                    id="offer"
+                    rows="4"
+                    placeholder="napr. účtovnícke služby pre živnostníkov, donáška sushi, online kurz"
+                  ></textarea>
+                </label>
+              </div>
+
+              <div class="actions">
+                <button class="primary-button" type="submit">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2v5M12 17v5M4.93 4.93l3.54 3.54M15.53 15.53l3.54 3.54M2 12h5M17 12h5M4.93 19.07l3.54-3.54M15.53 8.47l3.54-3.54" />
+                  </svg>
+                  Vygenerovať výstup
+                </button>
+                <button class="ghost-button" id="sample-button" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" />
+                  </svg>
+                  Testovací príklad
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="output-pane" aria-labelledby="output-title">
+            <div class="output-toolbar">
+              <div>
+                <p class="eyebrow">Výstup</p>
+                <h2 id="output-title">Návrh riešenia</h2>
+              </div>
+              <div class="icon-actions">
+                <button id="copy-button" type="button" aria-label="Kopírovať výstup">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 8h12v12H8zM4 4h12v12" />
+                  </svg>
+                </button>
+                <button id="download-button" type="button" aria-label="Stiahnuť výstup">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <article id="output" class="result">
+              <p class="empty-state">Vyplň vstupy a spusti generovanie.</p>
+            </article>
+          </section>
+        </div>
+      </section>
+
+      <section class="submission" id="test" aria-labelledby="test-title">
+        <div>
+          <p class="eyebrow">Ukážka testovania</p>
+          <h2 id="test-title">Konkrétny príklad použitia</h2>
+        </div>
+        <p id="test-summary">
+          Po kliknutí na testovací príklad sa formulár vyplní a výstup ukáže
+          štruktúru vhodnú na odovzdanie.
+        </p>
+      </section>
+
+      <section class="annotation" id="annotation" aria-labelledby="annotation-title">
+        <div>
+          <p class="eyebrow">Stručná anotácia</p>
+          <h2 id="annotation-title">Pre koho je nástroj</h2>
+        </div>
+        <p>
+          MarketPilot je jednoduchý nástroj pre malé firmy, študentov marketingu
+          a začínajúcich podnikateľov. Rieši problém nejasných vstupov tak, že z
+          nich vytvorí konkrétny audit alebo odporúčanie, ktoré sa dá ďalej
+          upraviť a použiť v praxi.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <span>MarketPilot</span>
+      <span>Statická stránka pripravená pre GitHub Pages</span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
