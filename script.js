@@ -1,6 +1,7 @@
 const state = {
   mode: "audit",
   lastText: "",
+  isLoading: false,
 };
 
 const modeButtons = document.querySelectorAll(".mode-button");
@@ -11,6 +12,7 @@ const sampleButton = document.querySelector("#sample-button");
 const copyButton = document.querySelector("#copy-button");
 const downloadButton = document.querySelector("#download-button");
 const testSummary = document.querySelector("#test-summary");
+const generateButton = form.querySelector(".primary-button");
 
 const fields = {
   pageInput: document.querySelector("#pageInput"),
@@ -24,69 +26,27 @@ const fields = {
 
 const labels = {
   pageGoal: {
-    predaj: "predaj produktu alebo služby",
-    lead: "získanie leadu",
-    informovanie: "informovanie návštevníka",
-    registracia: "registrácia alebo rezervácia",
+    predaj: "Predaj produktu alebo služby",
+    lead: "Získanie leadu",
+    informovanie: "Informovanie návštevníka",
+    registracia: "Registrácia alebo rezervácia",
   },
   businessType: {
-    lokalny: "lokálny podnik",
-    eshop: "e-shop",
+    lokalny: "Lokálny podnik",
+    eshop: "E-shop",
     b2b: "B2B služby",
-    creator: "osobná značka alebo tvorca",
+    creator: "Osobná značka alebo tvorca",
   },
   marketingGoal: {
-    predaj: "predaj",
-    brand: "budovanie značky",
-    lead: "získavanie leadov",
-    retencia: "udržanie zákazníkov",
-  },
-};
-
-const goalContent = {
-  predaj: {
-    problem: "hodnota ponuky nemusí byť jasná pred prvým scrollom",
-    cta: "zvýrazniť primárne tlačidlo s konkrétnou akciou",
-    headline: "Objednajte si riešenie, ktoré šetrí čas už od prvého dňa",
-  },
-  lead: {
-    problem: "formulár môže pôsobiť ako záväzok bez jasnej protihodnoty",
-    cta: "ponúknuť krátku výmenu, napríklad konzultáciu, checklist alebo cenový odhad",
-    headline: "Získajte rýchle odporúčanie pripravené pre váš ďalší krok",
-  },
-  informovanie: {
-    problem: "obsah môže návštevníka viesť k čítaniu, nie k rozhodnutiu",
-    cta: "doplniť jasný ďalší krok po prečítaní hlavného bloku",
-    headline: "Všetko podstatné vysvetlené jednoducho a bez zbytočného hľadania",
-  },
-  registracia: {
-    problem: "návštevník nemusí vidieť dôvod registrovať sa hneď",
-    cta: "ukázať benefit registrácie pri tlačidle a znížiť počet polí",
-    headline: "Rezervujte si miesto za menej než minútu",
-  },
-};
-
-const strategyRules = {
-  lokalny: {
-    channels: ["Google Business Profile", "lokálne SEO", "Meta Ads s geolokáciou"],
-    optimization: ["recenzie a fotky prevádzky", "lokálne kľúčové slová", "ponuka s jasnou dostupnosťou"],
-  },
-  eshop: {
-    channels: ["Google Shopping", "Meta Ads remarketing", "e-mail automatizácia"],
-    optimization: ["produktové stránky", "rýchlosť nákupu", "košík a opustené objednávky"],
-  },
-  b2b: {
-    channels: ["LinkedIn obsah", "Google Search kampane", "lead magnet"],
-    optimization: ["case studies", "kontaktný formulár", "dôkazy odbornosti"],
-  },
-  creator: {
-    channels: ["Instagram alebo TikTok", "newsletter", "komunitný obsah"],
-    optimization: ["konzistentný profil", "ukážky práce", "jednoduchá cesta k objednávke"],
+    predaj: "Predaj",
+    brand: "Budovanie značky",
+    lead: "Získavanie leadov",
+    retencia: "Udržanie zákazníkov",
   },
 };
 
 function escapeHtml(value) {
-  return String(value)
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -113,6 +73,7 @@ function money(value) {
 
 function setMode(mode) {
   state.mode = mode;
+  state.lastText = "";
 
   modeButtons.forEach((button) => {
     const isActive = button.dataset.mode === mode;
@@ -123,185 +84,164 @@ function setMode(mode) {
   panels.forEach((panel) => {
     panel.classList.toggle("active", panel.dataset.panel === mode);
   });
+
+  updateTestSummary();
+  showEmptyState("Vyplň vstupy a spusti generovanie cez ChatGPT.");
 }
 
-function getBudgetTier(budget) {
-  const amount = Number(budget) || 0;
+function updateTestSummary() {
+  testSummary.textContent =
+    state.mode === "audit"
+      ? "Ukážka vygeneruje audit landing page so zoznamom nedostatkov, odporúčaniami a alternatívnym headlineom."
+      : "Ukážka vygeneruje odporúčanú stratégiu, kanály, optimalizácie, zdôvodnenie a prvé kroky.";
+}
 
-  if (amount < 300) {
+function collectInputs() {
+  if (state.mode === "audit") {
     return {
-      name: "nízky rozpočet",
-      focus: "organický obsah, lokálne kanály a veľmi presne cielené testy",
-      split: "70 % obsah a SEO, 30 % malé výkonnostné testy",
-    };
-  }
-
-  if (amount < 1000) {
-    return {
-      name: "stredný rozpočet",
-      focus: "kombinácia plateného testovania, úprav webu a remarketingu",
-      split: "50 % platené kampane, 30 % optimalizácia webu, 20 % obsah",
+      pageInput: fields.pageInput.value.trim(),
+      pageGoal: fields.pageGoal.value,
+      pageGoalLabel: labels.pageGoal[fields.pageGoal.value],
+      pageAudience: fields.pageAudience.value.trim(),
     };
   }
 
   return {
-    name: "vyšší rozpočet",
-    focus: "škálovanie kampaní, systematická tvorba obsahu a meranie konverzií",
-    split: "60 % platené kampane, 25 % kreatíva a obsah, 15 % meranie a testovanie",
+    budget: Number(fields.budget.value) || 0,
+    budgetLabel: money(fields.budget.value),
+    businessType: fields.businessType.value,
+    businessTypeLabel: labels.businessType[fields.businessType.value],
+    marketingGoal: fields.marketingGoal.value,
+    marketingGoalLabel: labels.marketingGoal[fields.marketingGoal.value],
+    offer: fields.offer.value.trim(),
   };
 }
 
-function renderAudit() {
-  const pageInput = fields.pageInput.value.trim() || "nezadaná stránka alebo koncept";
-  const goal = fields.pageGoal.value;
-  const audience = fields.pageAudience.value.trim() || "návštevníci stránky";
-  const content = goalContent[goal];
-
-  const issues = [
-    `Prvý blok stránky môže príliš všeobecne vysvetľovať ponuku pre skupinu: ${audience}.`,
-    `Hlavná výzva na akciu nemusí priamo podporovať cieľ: ${labels.pageGoal[goal]}.`,
-    `Na stránke pravdepodobne chýba rýchly dôkaz dôvery, napríklad recenzia, číslo, ukážka výsledku alebo porovnanie.`,
-    `Sekcie môžu byť zoradené podľa firmy, nie podľa otázok, ktoré má zákazník pred rozhodnutím.`,
-  ];
-
-  const recommendations = [
-    `Upraviť hero sekciu tak, aby v jednej vete pomenovala výsledok pre cieľovú skupinu: ${audience}.`,
-    `Doplniť jedno dominantné CTA a text pri ňom zamerať na to, že cieľom je ${labels.pageGoal[goal]}.`,
-    `Pridať dôkaz dôvery hneď pri hlavnom argumente: referenciu, konkrétny benefit, garanciu alebo krátku metriku.`,
-    `Zjednodušiť poradie obsahu na: problém, riešenie, dôkaz, ponuka, akcia.`,
-  ];
-
-  const html = `
-    <div class="result-block">
-      <h3>Analyzovaný vstup</h3>
-      <p>${escapeHtml(pageInput)}</p>
-    </div>
-    <div class="result-block">
-      <h3>Identifikácia nedostatkov</h3>
-      <ul>${listItems(issues)}</ul>
-    </div>
-    <div class="result-block">
-      <h3>Odporúčané úpravy</h3>
-      <ol>${listItems(recommendations)}</ol>
-    </div>
-    <div class="result-block">
-      <h3>Alternatívny headline</h3>
-      <p class="quote-output">${escapeHtml(content.headline)}</p>
-    </div>
-    <div class="result-block">
-      <h3>Priorita</h3>
-      <p>Najskôr vyriešiť bod: ${escapeHtml(content.problem)}. Potom ${escapeHtml(content.cta)}.</p>
-    </div>
-  `;
-
-  const text = [
-    "AUDIT LANDING PAGE",
-    "",
-    `Analyzovaný vstup: ${pageInput}`,
-    `Primárny cieľ: ${labels.pageGoal[goal]}`,
-    `Cieľová skupina: ${audience}`,
-    "",
-    "Identifikácia nedostatkov:",
-    textList(issues),
-    "",
-    "Odporúčané úpravy:",
-    textList(recommendations),
-    "",
-    `Alternatívny headline: ${content.headline}`,
-    "",
-    `Priorita: Najskôr vyriešiť bod: ${content.problem}. Potom ${content.cta}.`,
-  ].join("\n");
-
-  return { html, text };
+function showEmptyState(message) {
+  output.innerHTML = `<p class="empty-state">${escapeHtml(message)}</p>`;
 }
 
-function renderStrategy() {
-  const budget = Number(fields.budget.value) || 0;
-  const businessType = fields.businessType.value;
-  const marketingGoal = fields.marketingGoal.value;
-  const offer = fields.offer.value.trim() || "zadaná ponuka";
-  const tier = getBudgetTier(budget);
-  const rules = strategyRules[businessType];
-
-  const channels = [...rules.channels];
-
-  if (marketingGoal === "brand") {
-    channels.unshift("organický obsah so sériou tém");
-  }
-
-  if (marketingGoal === "lead" && !channels.includes("lead magnet")) {
-    channels.push("lead magnet");
-  }
-
-  const steps = [
-    "Nastaviť meranie konverzie a jednu hlavnú metriku úspechu.",
-    `Pripraviť vstupnú ponuku pre segment: ${labels.businessType[businessType]}.`,
-    `Spustiť prvý test s rozpočtovým rámcom ${money(budget)} a po 7 dňoch vyhodnotiť cenu výsledku.`,
-    "Presunúť rozpočet iba do kanála, ktorý prináša najkvalitnejší signál.",
-  ];
-
-  const strategy = `Pre ponuku "${offer}" odporúčam stratégiu zameranú na ${labels.marketingGoal[marketingGoal]}. Pri rozpočte ${money(budget)} ide o ${tier.name}, preto má dávať najväčší zmysel ${tier.focus}.`;
-
-  const html = `
-    <div class="result-block">
-      <h3>Odporúčaná stratégia</h3>
-      <p>${escapeHtml(strategy)}</p>
-      <p><strong>Rozdelenie rozpočtu:</strong> ${escapeHtml(tier.split)}.</p>
-    </div>
-    <div class="result-block">
-      <h3>Vhodné komunikačné kanály</h3>
-      <ul>${listItems(channels)}</ul>
-    </div>
-    <div class="result-block">
-      <h3>Oblasti na optimalizáciu</h3>
-      <ul>${listItems(rules.optimization)}</ul>
-    </div>
-    <div class="result-block">
-      <h3>Stručné zdôvodnenie</h3>
-      <p>Vybrané kanály zodpovedajú typu podnikania, cieľu a veľkosti rozpočtu. Nástroj odporúča začať menším testom, merať konkrétny výsledok a až potom škálovať.</p>
-    </div>
-    <div class="result-block">
-      <h3>Prvé kroky</h3>
-      <ol>${listItems(steps)}</ol>
+function showError(message) {
+  output.innerHTML = `
+    <div class="result-block error-state">
+      <h3>Generovanie zlyhalo</h3>
+      <p>${escapeHtml(message)}</p>
     </div>
   `;
-
-  const text = [
-    "MARKETINGOVÝ ROZHODOVAČ",
-    "",
-    `Ponuka: ${offer}`,
-    `Typ podnikania: ${labels.businessType[businessType]}`,
-    `Marketingový cieľ: ${labels.marketingGoal[marketingGoal]}`,
-    `Rozpočet: ${money(budget)}`,
-    "",
-    "Odporúčaná stratégia:",
-    strategy,
-    `Rozdelenie rozpočtu: ${tier.split}.`,
-    "",
-    "Vhodné komunikačné kanály:",
-    textList(channels),
-    "",
-    "Oblasti na optimalizáciu:",
-    textList(rules.optimization),
-    "",
-    "Stručné zdôvodnenie:",
-    "Vybrané kanály zodpovedajú typu podnikania, cieľu a veľkosti rozpočtu. Nástroj odporúča začať menším testom, merať konkrétny výsledok a až potom škálovať.",
-    "",
-    "Prvé kroky:",
-    textList(steps),
-  ].join("\n");
-
-  return { html, text };
 }
 
-function generate() {
-  const result = state.mode === "audit" ? renderAudit() : renderStrategy();
-  output.innerHTML = result.html;
-  state.lastText = result.text;
-  testSummary.textContent =
-    state.mode === "audit"
-      ? "Ukážka obsahuje audit landing page so zoznamom nedostatkov, odporúčaniami a alternatívnym headlineom."
-      : "Ukážka obsahuje odporúčanú stratégiu, kanály, optimalizácie, zdôvodnenie a prvé kroky.";
+function setLoading(isLoading) {
+  state.isLoading = isLoading;
+  generateButton.disabled = isLoading;
+  sampleButton.disabled = isLoading;
+  generateButton.classList.toggle("loading", isLoading);
+
+  if (isLoading) {
+    generateButton.dataset.originalText = generateButton.textContent.trim();
+    generateButton.lastChild.textContent = " ChatGPT generuje...";
+  } else if (generateButton.dataset.originalText) {
+    generateButton.lastChild.textContent = " Vygenerovať výstup";
+  }
+}
+
+function renderSection(section) {
+  const heading = escapeHtml(section.heading || "Výstup");
+  const kind = section.kind || "paragraph";
+  const items = Array.isArray(section.items) ? section.items.filter(Boolean) : [];
+  const body = section.body || "";
+
+  if (items.length > 0) {
+    const tag = kind === "ordered" ? "ol" : "ul";
+    return `
+      <div class="result-block">
+        <h3>${heading}</h3>
+        <${tag}>${listItems(items)}</${tag}>
+      </div>
+    `;
+  }
+
+  if (kind === "quote") {
+    return `
+      <div class="result-block">
+        <h3>${heading}</h3>
+        <p class="quote-output">${escapeHtml(body)}</p>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="result-block">
+      <h3>${heading}</h3>
+      <p>${escapeHtml(body)}</p>
+    </div>
+  `;
+}
+
+function buildTextFromResult(result) {
+  const lines = [result.title || "MarketPilot výstup", ""];
+
+  result.sections.forEach((section) => {
+    lines.push(section.heading || "Výstup");
+
+    if (Array.isArray(section.items) && section.items.length > 0) {
+      lines.push(textList(section.items));
+    } else {
+      lines.push(section.body || "");
+    }
+
+    lines.push("");
+  });
+
+  return lines.join("\n").trim();
+}
+
+function renderAiResult(result) {
+  const sections = Array.isArray(result.sections) ? result.sections : [];
+
+  if (sections.length === 0) {
+    throw new Error("Backend vrátil prázdny výstup.");
+  }
+
+  output.innerHTML = sections.map(renderSection).join("");
+  state.lastText = result.text || buildTextFromResult({ ...result, sections });
+}
+
+async function generate() {
+  if (state.isLoading) {
+    return;
+  }
+
+  setLoading(true);
+  showEmptyState("ChatGPT pripravuje konkrétny marketingový výstup...");
+
+  try {
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mode: state.mode,
+        inputs: collectInputs(),
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || "Nepodarilo sa spojiť s backendom.");
+    }
+
+    renderAiResult(data);
+  } catch (error) {
+    state.lastText = "";
+    showError(
+      error.message ||
+        "Skontroluj, či je projekt nasadený s backendom a či je nastavený OPENAI_API_KEY.",
+    );
+  } finally {
+    setLoading(false);
+  }
 }
 
 function fillSample() {
@@ -309,20 +249,23 @@ function fillSample() {
     fields.pageInput.value =
       "Landing page pre lokálne fitness štúdio. Stránka komunikuje moderné tréningy, ale hlavný CTA text je iba Kontaktujte nás.";
     fields.pageGoal.value = "lead";
-    fields.pageAudience.value = "ľudia z mesta, ktorí chcú začať pravidelne cvičiť";
+    fields.pageAudience.value =
+      "ľudia z mesta, ktorí chcú začať pravidelne cvičiť";
   } else {
     fields.budget.value = "1000";
     fields.businessType.value = "eshop";
     fields.marketingGoal.value = "predaj";
     fields.offer.value = "e-shop s prírodnou kozmetikou pre citlivú pleť";
   }
-
-  generate();
 }
 
 async function copyOutput() {
   if (!state.lastText) {
-    generate();
+    await generate();
+  }
+
+  if (!state.lastText) {
+    return;
   }
 
   try {
@@ -339,9 +282,13 @@ async function copyOutput() {
   }
 }
 
-function downloadOutput() {
+async function downloadOutput() {
   if (!state.lastText) {
-    generate();
+    await generate();
+  }
+
+  if (!state.lastText) {
+    return;
   }
 
   const blob = new Blob([state.lastText], { type: "text/plain;charset=utf-8" });
@@ -359,7 +306,6 @@ function downloadOutput() {
 modeButtons.forEach((button) => {
   button.addEventListener("click", () => {
     setMode(button.dataset.mode);
-    generate();
   });
 });
 
@@ -368,8 +314,13 @@ form.addEventListener("submit", (event) => {
   generate();
 });
 
-sampleButton.addEventListener("click", fillSample);
+sampleButton.addEventListener("click", () => {
+  fillSample();
+  generate();
+});
+
 copyButton.addEventListener("click", copyOutput);
 downloadButton.addEventListener("click", downloadOutput);
 
-generate();
+updateTestSummary();
+showEmptyState("Vyplň vstupy a spusti generovanie cez ChatGPT.");

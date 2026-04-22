@@ -1,18 +1,35 @@
 # MarketPilot
 
-Jednoduchá statická stránka pre workshop: návrh AI marketingového nástroja.
+Jednoduchá webová aplikácia pre workshop: návrh AI marketingového nástroja.
 
 ## Čo stránka robí
 
 - Audit landing page podľa URL alebo stručného popisu obsahu
 - Marketingový rozhodovač podľa rozpočtu, typu podnikania a cieľa
-- Generuje štruktúrovaný výstup, ktorý sa dá kopírovať alebo stiahnuť ako `.txt`
+- Generuje reálne odpovede cez OpenAI Responses API
+- Výstup sa dá kopírovať alebo stiahnuť ako `.txt`
 
-## Publikovanie cez GitHub Pages
+## Dôležité
 
-1. Nahraj súbory `index.html`, `style.css` a `script.js` do repozitára.
-2. V nastaveniach repozitára otvor `Settings` -> `Pages`.
-3. Ako zdroj vyber vetvu `main` a priečinok `/root`.
-4. GitHub vygeneruje verejný odkaz na stránku.
+API kľúč nesmie byť v `index.html` ani v `script.js`. Frontend volá endpoint
+`/api/generate` a backend číta kľúč z environment variable `OPENAI_API_KEY`.
 
-Ak sa repozitár volá `tvoje-meno.github.io`, stránka bude dostupná priamo na adrese `https://tvoje-meno.github.io/`.
+GitHub Pages samotný backend nespustí. Na reálne ChatGPT odpovede použi napríklad
+Vercel, Netlify alebo iný hosting so serverless funkciami.
+
+## Nasadenie cez Vercel
+
+1. Importuj GitHub repozitár do Vercelu.
+2. V nastaveniach projektu otvor `Environment Variables`.
+3. Pridaj:
+   - `OPENAI_API_KEY` = tvoj OpenAI API kľúč
+   - `OPENAI_MODEL` = `gpt-5.4-mini` alebo iný dostupný model
+4. Deployni projekt.
+
+Frontend potom bude volať `/api/generate` a odpovede budú generované cez ChatGPT.
+
+## Lokálna kontrola syntaxe
+
+```bash
+npm run check
+```

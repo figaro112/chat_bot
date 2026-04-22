@@ -181,6 +181,18 @@ h2 {
   transform: translateY(-2px);
 }
 
+button:disabled,
+.primary-button:disabled,
+.ghost-button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}
+
+.primary-button.loading svg {
+  animation: spin 900ms linear infinite;
+}
+
 svg {
   width: 1.15rem;
   height: 1.15rem;
@@ -529,6 +541,15 @@ textarea:focus {
   text-align: center;
 }
 
+.error-state {
+  border-top-color: #d85f47;
+  color: #5a261c;
+}
+
+.error-state h3 {
+  color: #a23222;
+}
+
 .submission,
 .annotation {
   display: grid;
@@ -588,6 +609,12 @@ footer {
   50% {
     transform: scale(1.1);
     opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
