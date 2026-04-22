@@ -106,17 +106,13 @@ a {
 }
 
 .hero {
-  display: grid;
   min-height: calc(100svh - 4.6rem);
-  grid-template-columns: minmax(0, 0.92fr) minmax(18rem, 0.78fr);
-  gap: clamp(2rem, 7vw, 6rem);
-  align-items: center;
   padding: clamp(3rem, 7vw, 6rem) clamp(1rem, 6vw, 5rem);
   overflow: hidden;
 }
 
 .hero-copy {
-  max-width: 48rem;
+  max-width: 58rem;
   animation: rise-in 620ms ease-out both;
 }
 
@@ -201,106 +197,6 @@ svg {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
-}
-
-.hero-visual {
-  position: relative;
-  min-height: min(48rem, 70svh);
-  animation: fade-in 760ms 120ms ease-out both;
-}
-
-.signal-panel {
-  position: absolute;
-  left: 4%;
-  top: 8%;
-  width: min(22rem, 84%);
-  padding: 1.2rem;
-  border: 1px solid rgba(255, 255, 255, 0.46);
-  border-radius: 1rem;
-  background: rgba(20, 20, 20, 0.92);
-  box-shadow: var(--shadow);
-  color: #fff;
-}
-
-.signal-panel strong {
-  display: block;
-}
-
-.signal-panel div,
-.signal-panel strong {
-  height: 1rem;
-  margin-top: 0.8rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
-}
-
-.signal-panel div:first-child,
-.signal-panel strong:first-child {
-  margin-top: 0;
-}
-
-.signal-panel div:nth-child(1) {
-  width: 88%;
-}
-
-.signal-panel div:nth-child(2) {
-  width: 68%;
-}
-
-.signal-panel div:nth-child(3) {
-  width: 76%;
-}
-
-.signal-panel.output {
-  left: auto;
-  right: 0;
-  top: auto;
-  bottom: 9%;
-  width: min(24rem, 88%);
-  background: #fff;
-  color: var(--ink);
-}
-
-.signal-panel.output strong {
-  height: auto;
-  padding: 0.8rem 0.9rem;
-  background: var(--surface-soft);
-}
-
-.signal-flow {
-  position: absolute;
-  inset: 20% 4% 20% 22%;
-  border-radius: 999px;
-  border: 1px dashed rgba(15, 118, 110, 0.52);
-  transform: rotate(-17deg);
-}
-
-.signal-flow i {
-  position: absolute;
-  display: block;
-  width: 0.9rem;
-  height: 0.9rem;
-  border-radius: 999px;
-  background: var(--amber);
-  box-shadow: 0 0 0 0.65rem rgba(244, 183, 64, 0.13);
-  animation: pulse 1.8s ease-in-out infinite;
-}
-
-.signal-flow i:nth-child(1) {
-  left: 20%;
-  top: 12%;
-}
-
-.signal-flow i:nth-child(2) {
-  left: 55%;
-  top: 46%;
-  animation-delay: 180ms;
-}
-
-.signal-flow i:nth-child(3) {
-  right: 12%;
-  bottom: 14%;
-  animation-delay: 360ms;
 }
 
 .workspace,
@@ -591,27 +487,6 @@ footer {
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(0.88);
-    opacity: 0.72;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-}
-
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -629,16 +504,11 @@ footer {
 
   .hero {
     min-height: auto;
-    grid-template-columns: 1fr;
     padding-top: 2.2rem;
   }
 
   h1 {
     max-width: 10ch;
-  }
-
-  .hero-visual {
-    min-height: 24rem;
   }
 
   .section-heading,
